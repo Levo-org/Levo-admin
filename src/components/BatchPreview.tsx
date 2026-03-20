@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { UploadPreviewResponse } from '../types/import';
 import { importService } from '../services/import.service';
 

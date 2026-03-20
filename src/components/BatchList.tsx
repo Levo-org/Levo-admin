@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ImportBatch } from '../types/import';
 import { importService } from '../services/import.service';
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ContentItem } from '../types/workflow';
 import { workflowService } from '../services/workflow.service';
 import { useAuthStore } from '../stores/authStore';
@@ -43,15 +43,6 @@ export default function ReviewQueue({ status, title }: ReviewQueueProps) {
       alert('상태 변경 중 오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
-    }
-  };
-
-  const getStatusBadge = (s: string) => {
-    switch (s) {
-      case 'in_review': return <span className="badge" style={{ backgroundColor: 'var(--status-in-review-bg)', color: 'var(--status-in-review-text)' }}>검수 대기</span>;
-      case 'approved': return <span className="badge" style={{ backgroundColor: 'var(--status-approved-bg)', color: 'var(--status-approved-text)' }}>승인됨</span>;
-      case 'published': return <span className="badge" style={{ backgroundColor: 'var(--status-published-bg)', color: 'var(--status-published-text)' }}>게시됨</span>;
-      default: return <span className="badge">{s}</span>;
     }
   };
 

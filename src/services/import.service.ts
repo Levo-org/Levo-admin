@@ -1,5 +1,5 @@
 import api from './api';
-import { ApiResponse, PaginationInfo } from '../types';
+import { ApiResponse } from '../types';
 import { ImportBatch, UploadPreviewResponse } from '../types/import';
 
 export const importService = {

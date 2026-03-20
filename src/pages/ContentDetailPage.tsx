@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { contentService, ContentItem } from '../services/content.service';
 import { ContentForm } from '../components/ContentForm';
@@ -11,7 +11,7 @@ export default function ContentDetailPage() {
   const [data, setData] = useState<Partial<ContentItem> | null>(null);
   const [loading, setLoading] = useState(!isNew);
   const [error, setError] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [_saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (isNew) {
