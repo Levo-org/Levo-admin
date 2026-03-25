@@ -13,9 +13,17 @@ export default function ContentDetailPage() {
   const [error, setError] = useState('');
   const [_saving, setSaving] = useState(false);
 
+  const createInitialData = (type?: string): Partial<ContentItem> => {
+    if (type === 'listening' || type === 'reading') {
+      return { status: 'draft', targetLanguage: 'en', difficulty: 'beginner' };
+    }
+
+    return { status: 'draft', targetLanguage: 'en', level: 'beginner' };
+  };
+
   useEffect(() => {
     if (isNew) {
-      setData({ status: 'draft', targetLanguage: 'en', level: 'beginner' });
+      setData(createInitialData(contentType));
       setLoading(false);
       return;
     }

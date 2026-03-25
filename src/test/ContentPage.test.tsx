@@ -65,4 +65,16 @@ describe('ContentPage', () => {
       );
     });
   });
+
+  it('hides chapter filter for non-vocabulary content', () => {
+    render(
+      <MemoryRouter initialEntries={['/content/reading']}>
+        <Routes>
+          <Route path="/content/:contentType" element={<ContentPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByPlaceholderText('챕터')).not.toBeInTheDocument();
+  });
 });

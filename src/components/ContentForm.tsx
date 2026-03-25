@@ -9,11 +9,13 @@ interface ContentFormProps {
 }
 
 export const ContentForm: React.FC<ContentFormProps> = ({ initialData, contentType, onSubmit, onCancel }) => {
+  const difficultyFieldName = contentType === 'listening' || contentType === 'reading' ? 'difficulty' : 'level';
   const [formData, setFormData] = useState<Partial<ContentItem>>(initialData || {
     status: 'draft',
     targetLanguage: 'en',
-    level: 'beginner',
+    [difficultyFieldName]: 'beginner',
   });
+  const selectedDifficulty = (difficultyFieldName === 'difficulty' ? formData.difficulty : formData.level) || 'beginner';
 
   const isPublished = formData.status === 'published';
   const isReadOnly = isPublished;
@@ -71,8 +73,8 @@ export const ContentForm: React.FC<ContentFormProps> = ({ initialData, contentTy
         <div className="form-group" style={{ flex: 1 }}>
           <label className="form-label">난이도</label>
           <select
-            name="level"
-            value={formData.level || 'beginner'}
+            name={difficultyFieldName}
+            value={selectedDifficulty}
             onChange={handleChange}
             className="form-control"
             disabled={isReadOnly}
