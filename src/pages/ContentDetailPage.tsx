@@ -15,7 +15,7 @@ export default function ContentDetailPage() {
 
   useEffect(() => {
     if (isNew) {
-      setData({ status: 'draft', targetLanguage: 'en', level: 1 });
+      setData({ status: 'draft', targetLanguage: 'en', level: 'beginner' });
       setLoading(false);
       return;
     }

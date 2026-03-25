@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ContentItem } from '../services/content.service';
+import { ContentItem, DIFFICULTY_OPTIONS } from '../services/content.service';
 
 interface ContentFormProps {
   initialData?: Partial<ContentItem>;
@@ -12,7 +12,7 @@ export const ContentForm: React.FC<ContentFormProps> = ({ initialData, contentTy
   const [formData, setFormData] = useState<Partial<ContentItem>>(initialData || {
     status: 'draft',
     targetLanguage: 'en',
-    level: 1,
+    level: 'beginner',
   });
 
   const isPublished = formData.status === 'published';
@@ -22,7 +22,7 @@ export const ContentForm: React.FC<ContentFormProps> = ({ initialData, contentTy
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'level' || name === 'difficulty' ? Number(value) : value,
+      [name]: value,
     }));
   };
 
@@ -70,16 +70,19 @@ export const ContentForm: React.FC<ContentFormProps> = ({ initialData, contentTy
 
         <div className="form-group" style={{ flex: 1 }}>
           <label className="form-label">난이도</label>
-          <input
-            type="number"
+          <select
             name="level"
-            value={formData.level || 1}
-            min={1}
-            max={6}
+            value={formData.level || 'beginner'}
             onChange={handleChange}
             className="form-control"
             disabled={isReadOnly}
-          />
+          >
+            {DIFFICULTY_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

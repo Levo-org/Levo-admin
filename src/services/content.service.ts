@@ -1,11 +1,22 @@
 import api from './api';
 import { ApiResponse } from '../types';
 
+export type DifficultyLevel = 'beginner' | 'elementary' | 'intermediate' | 'advanced';
+
+export const DIFFICULTY_OPTIONS: Array<{ value: DifficultyLevel; label: string }> = [
+  { value: 'beginner', label: '입문' },
+  { value: 'elementary', label: '초급' },
+  { value: 'intermediate', label: '중급' },
+  { value: 'advanced', label: '고급' },
+];
+
 export interface ContentItem {
   _id: string;
   status: 'draft' | 'in_review' | 'approved' | 'published' | 'archived';
   targetLanguage: string;
-  level: number;
+  level?: DifficultyLevel;
+  difficulty?: DifficultyLevel;
+  chapter?: number;
   topic?: string;
   updatedAt: string;
   
@@ -29,7 +40,6 @@ export interface ContentItem {
   // exampleSentence
   text?: string;
   translation?: string;
-  difficulty?: number;
   source?: string;
   license?: string;
 
@@ -46,10 +56,23 @@ export interface ContentListParams {
   limit?: number;
   status?: string;
   targetLanguage?: string;
-  level?: number;
+  level?: DifficultyLevel;
+  chapter?: number;
   search?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+}
+
+export function getContentDifficulty(item: Pick<ContentItem, 'level' | 'difficulty'>): DifficultyLevel | undefined {
+  return item.difficulty ?? item.level;
+}
+
+export function formatDifficultyLabel(level?: DifficultyLevel): string {
+  if (!level) {
+    return '-';
+  }
+
+  return DIFFICULTY_OPTIONS.find((option) => option.value === level)?.label ?? level;
 }
 
 export const contentService = {
