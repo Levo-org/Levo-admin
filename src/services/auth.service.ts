@@ -1,15 +1,19 @@
 import api from './api';
-import { AuthTokens, AdminUser } from '../types';
+import { ApiResponse, AuthTokens, AdminUser } from '../types';
 
 export interface LoginResponse {
   tokens: AuthTokens;
   user: AdminUser;
 }
 
+export interface RefreshResponse {
+  tokens: AuthTokens;
+}
+
 export const authService = {
-  login: async (email: string, password: string) => {
-    const response = await api.post('/admin/auth/login', { email, password });
-    return response.data;
+  login: async (email: string, password: string): Promise<LoginResponse> => {
+    const response = await api.post<ApiResponse<LoginResponse>>('/admin/auth/login', { email, password });
+    return response.data.data;
   },
   
   logout: async () => {
@@ -20,8 +24,8 @@ export const authService = {
     }
   },
   
-  refresh: async (refreshToken: string) => {
-    const response = await api.post('/admin/auth/refresh', { refreshToken });
-    return response.data;
+  refresh: async (refreshToken: string): Promise<RefreshResponse> => {
+    const response = await api.post<ApiResponse<RefreshResponse>>('/admin/auth/refresh', { refreshToken });
+    return response.data.data;
   }
 };
