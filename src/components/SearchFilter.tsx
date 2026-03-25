@@ -1,24 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { DIFFICULTY_OPTIONS } from '../services/content.service';
 
-interface FilterValues {
+export interface FilterValues {
   search: string;
   status: string;
   targetLanguage: string;
   level: string;
+  chapter: string;
 }
 
 interface SearchFilterProps {
   onFilter: (filters: FilterValues) => void;
   initialValues?: Partial<FilterValues>;
+  contentType: string;
 }
 
-export const SearchFilter: React.FC<SearchFilterProps> = ({ onFilter, initialValues }) => {
-  const [filters, setFilters] = useState<FilterValues>({
-    search: initialValues?.search || '',
-    status: initialValues?.status || '',
-    targetLanguage: initialValues?.targetLanguage || '',
-    level: initialValues?.level || '',
-  });
+const createFilters = (initialValues?: Partial<FilterValues>): FilterValues => ({
+  search: initialValues?.search || '',
+  status: initialValues?.status || '',
+  targetLanguage: initialValues?.targetLanguage || '',
+  level: initialValues?.level || '',
+  chapter: initialValues?.chapter || '',
+});
+
+export const SearchFilter: React.FC<SearchFilterProps> = ({ onFilter, initialValues, contentType }) => {
+  const [filters, setFilters] = useState<FilterValues>(createFilters(initialValues));
+
+  useEffect(() => {
+    setFilters(createFilters(initialValues));
+  }, [initialValues, contentType]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -79,13 +89,25 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({ onFilter, initialVal
         style={{ width: '120px' }}
       >
         <option value="">모든 난이도</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="6">6</option>
+        {DIFFICULTY_OPTIONS.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
       </select>
+
+      {contentType === 'vocabulary' && (
+        <input
+          type="number"
+          name="chapter"
+          value={filters.chapter}
+          onChange={handleChange}
+          placeholder="챕터"
+          min={1}
+          className="form-control"
+          style={{ width: '120px' }}
+        />
+      )}
 
       <button type="submit" className="btn btn-primary">
         검색
