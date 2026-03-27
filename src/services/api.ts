@@ -1,8 +1,26 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/authStore';
 
+const DEFAULT_API_BASE = 'https://levo-be.vercel.app/api/v1';
+
+function resolveApiBaseUrl(): string {
+  const raw = import.meta.env.VITE_API_URL?.trim();
+  const base = raw && raw.length > 0 ? raw : DEFAULT_API_BASE;
+  const normalized = base.replace(/\/+$/, '');
+
+  if (normalized.endsWith('/api/v1')) {
+    return normalized;
+  }
+
+  if (normalized.endsWith('/api')) {
+    return `${normalized}/v1`;
+  }
+
+  return `${normalized}/api/v1`;
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1',
+  baseURL: resolveApiBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
