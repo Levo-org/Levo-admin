@@ -18,6 +18,7 @@ export default function Layout() {
     { path: '/content', label: '콘텐츠 관리', roles: ['editor', 'reviewer', 'admin'] },
     { path: '/imports', label: '가져오기', roles: ['editor', 'admin'] },
     { path: '/review', label: '검수 대기열', roles: ['reviewer', 'admin'] },
+    { path: '/members', label: '회원 관리', roles: ['admin'] },
     { path: '/settings', label: '설정', roles: ['admin'] },
   ];
 

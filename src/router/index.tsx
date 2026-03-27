@@ -9,6 +9,7 @@ import ContentDetailPage from '../pages/ContentDetailPage';
 import ImportsPage from '../pages/ImportsPage';
 import ReviewPage from '../pages/ReviewPage';
 import SettingsPage from '../pages/SettingsPage';
+import MembersPage from '../pages/MembersPage';
 import UnauthorizedPage from '../pages/UnauthorizedPage';
 import NotFoundPage from '../pages/NotFoundPage';
 
@@ -85,6 +86,11 @@ export default function AppRouter() {
           <Route path="settings" element={
             <PrivateRoute allowedRoles={['admin']}>
               <SettingsPage />
+            </PrivateRoute>
+          } />
+          <Route path="members" element={
+            <PrivateRoute allowedRoles={['admin']}>
+              <MembersPage />
             </PrivateRoute>
           } />
         </Route>
