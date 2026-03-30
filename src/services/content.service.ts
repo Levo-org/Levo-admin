@@ -27,9 +27,11 @@ export interface ContentItem {
   partOfSpeech?: string;
   exampleSentence?: string;
   exampleTranslation?: string;
+  audioUrl?: string;
   
   // grammar, conversation, reading
   title?: string;
+  icon?: string;
   subtitle?: string;
   englishTitle?: string;
   explanation?: string;
@@ -37,9 +39,10 @@ export interface ContentItem {
   formulaExample?: string;
   structure?: string;
   examples?: Array<{ text?: string; sentence?: string; translation: string }>;
+  quizzes?: Array<{ question: string; options: string[]; correctAnswer?: number; explanation?: string }>;
   
   // conversation
-  dialogs?: Array<{ speaker: string; text: string; translation: string }>;
+  dialogs?: Array<{ speaker: string; text: string; translation: string; isUserRole?: boolean }>;
   keyExpressions?: Array<{ expression: string; meaning: string }>;
   
   // exampleSentence

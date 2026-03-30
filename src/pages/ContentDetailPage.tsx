@@ -1,8 +1,138 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { contentService, ContentItem } from '../services/content.service';
 import { ContentForm } from '../components/ContentForm';
 import { useAuthStore } from '../stores/authStore';
+
+const APP_REQUIRED_FIELDS: Record<string, string[]> = {
+  vocabulary: ['word', 'meaning', 'partOfSpeech', 'level', 'chapter'],
+  grammar: ['title', 'level', 'explanation', 'formula'],
+  conversation: ['title', 'level', 'dialogs'],
+  exampleSentence: ['originalText', 'translation', 'level'],
+  listening: ['audioText', 'correctAnswer', 'difficulty'],
+  reading: ['title', 'content', 'difficulty', 'quizzes'],
+};
+
+const isBlank = (value: unknown): boolean => {
+  if (value === null || value === undefined) return true;
+  if (typeof value === 'string') return value.trim().length === 0;
+  if (Array.isArray(value)) return value.length === 0;
+  return false;
+};
+
+const findMissingAppFields = (contentType: string, data: Partial<ContentItem>): string[] => {
+  const requiredFields = APP_REQUIRED_FIELDS[contentType] ?? [];
+
+  return requiredFields.filter((field) => {
+    if (field === 'originalText') {
+      return isBlank(data.originalText) && isBlank(data.text);
+    }
+
+    if (field === 'difficulty') {
+      return isBlank(data.difficulty) && isBlank(data.level);
+    }
+
+    const value = data[field as keyof ContentItem];
+    return isBlank(value);
+  });
+};
+
+const buildAppPreview = (contentType: string, data: Partial<ContentItem>): Record<string, unknown> => {
+  if (contentType === 'vocabulary') {
+    return {
+      _id: data._id,
+      word: data.word || '',
+      pronunciation: data.pronunciation || '',
+      meaning: data.meaning || '',
+      partOfSpeech: data.partOfSpeech || '',
+      exampleSentence: data.exampleSentence || '',
+      exampleTranslation: data.exampleTranslation || '',
+      audioUrl: data.audioUrl || '',
+      level: data.level || 'beginner',
+      chapter: data.chapter,
+    };
+  }
+
+  if (contentType === 'grammar') {
+    return {
+      _id: data._id,
+      title: data.title || '',
+      level: data.level || 'beginner',
+      explanation: data.explanation || '',
+      formula: data.formula || '',
+      formulaDesc: data.formulaExample || '',
+      examples: (data.examples || []).map((item) => ({
+        sentence: item.sentence || item.text || '',
+        translation: item.translation || '',
+      })),
+      questions: (data.quizzes || []).map((quiz) => ({
+        question: quiz.question,
+        options: quiz.options,
+        correctIndex: quiz.correctAnswer,
+      })),
+    };
+  }
+
+  if (contentType === 'conversation') {
+    const dialogs = (data.dialogs || []).map((dialog) => ({
+      speaker: dialog.speaker,
+      text: dialog.text,
+      translation: dialog.translation,
+      isUserRole: Boolean(dialog.isUserRole),
+      isUser: Boolean(dialog.isUserRole),
+    }));
+
+    return {
+      _id: data._id,
+      emoji: data.icon || '💬',
+      title: data.title || '',
+      level: data.level || 'beginner',
+      description: '',
+      dialogs,
+      dialog: dialogs,
+      keyExpressions: data.keyExpressions || [],
+    };
+  }
+
+  if (contentType === 'exampleSentence') {
+    return {
+      _id: data._id,
+      originalText: data.originalText || data.text || '',
+      translation: data.translation || '',
+      topic: data.topic || '',
+      level: data.level || 'beginner',
+    };
+  }
+
+  if (contentType === 'listening') {
+    return {
+      _id: data._id,
+      question: 'Choose what you heard.',
+      options: data.correctAnswer ? [data.correctAnswer] : [],
+      ttsText: data.audioText || data.correctAnswer || '',
+      difficulty: data.difficulty || data.level || 'beginner',
+      audioUrl: null,
+      answerForValidation: data.correctAnswer || '',
+    };
+  }
+
+  if (contentType === 'reading') {
+    return {
+      _id: data._id,
+      title: data.title || '',
+      text: data.content || '',
+      translation: data.translation || '',
+      difficulty: data.difficulty || data.level || 'beginner',
+      questions: (data.quizzes || []).map((quiz) => ({
+        question: quiz.question,
+        options: quiz.options,
+        correctIndex: quiz.correctAnswer,
+      })),
+    };
+  }
+
+  return data;
+};
 
 export default function ContentDetailPage() {
   const { contentType, id } = useParams<{ contentType: string; id: string }>();
@@ -15,6 +145,16 @@ export default function ContentDetailPage() {
   const [loading, setLoading] = useState(!isNew);
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
+
+  const appVisiblePreview = useMemo(() => {
+    if (!data || !contentType) return null;
+    return buildAppPreview(contentType, data);
+  }, [data, contentType]);
+
+  const missingAppFields = useMemo(() => {
+    if (!data || !contentType) return [];
+    return findMissingAppFields(contentType, data);
+  }, [data, contentType]);
 
   const createInitialData = (type?: string): Partial<ContentItem> => {
     if (type === 'listening' || type === 'reading') {
@@ -106,13 +246,42 @@ export default function ContentDetailPage() {
       {error && <div style={{ color: 'var(--color-danger)', marginBottom: 'var(--spacing-4)' }}>{error}</div>}
 
       {data && (
-        <ContentForm
-          key={`${contentType}-${id}`}
-          initialData={data}
-          contentType={contentType || 'vocabulary'}
-          onSubmit={handleSubmit}
-          onCancel={() => navigate(`/content/${contentType}`)}
-        />
+        <>
+          <ContentForm
+            key={`${contentType}-${id}`}
+            initialData={data}
+            contentType={contentType || 'vocabulary'}
+            onSubmit={handleSubmit}
+            onCancel={() => navigate(`/content/${contentType}`)}
+          />
+
+          <div className="card" style={{ marginTop: 'var(--spacing-4)', padding: 'var(--spacing-6)' }}>
+            <h3 style={{ marginTop: 0, marginBottom: 'var(--spacing-3)' }}>앱 노출 데이터 미리보기</h3>
+            <p style={{ marginTop: 0, marginBottom: 'var(--spacing-3)', color: 'var(--color-text-muted)' }}>
+              앱에서 사용하는 응답 형태 기준으로 렌더링한 값입니다.
+            </p>
+            {missingAppFields.length > 0 && (
+              <div style={{ color: 'var(--color-danger)', marginBottom: 'var(--spacing-3)', fontWeight: 500 }}>
+                앱 노출 필수값 누락: {missingAppFields.join(', ')}
+              </div>
+            )}
+            <pre
+              style={{
+                margin: 0,
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                fontSize: '0.875rem',
+                lineHeight: 1.5,
+                background: '#111827',
+                color: '#E5E7EB',
+                padding: '1rem',
+                borderRadius: '0.5rem',
+              }}
+            >
+              {JSON.stringify(appVisiblePreview, null, 2)}
+            </pre>
+          </div>
+        </>
       )}
     </div>
   );
