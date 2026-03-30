@@ -37,8 +37,8 @@ export const importService = {
     return response.data;
   },
 
-  getBatchErrors: async (batchId: string): Promise<ApiResponse<any>> => {
-    const response = await api.get<ApiResponse<any>>(`/admin/import/${batchId}/errors`);
+  getBatchErrors: async (batchId: string): Promise<ApiResponse<unknown>> => {
+    const response = await api.get<ApiResponse<unknown>>(`/admin/import/${batchId}/errors`);
     return response.data;
   }
 };

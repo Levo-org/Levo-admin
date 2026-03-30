@@ -30,7 +30,7 @@ export default function BatchPreview({ previewData, onComplete, onCancel }: Batc
       setIsSubmitting(true);
       await importService.cancelBatch(previewData.batchId);
       onCancel();
-    } catch (err) {
+    } catch {
       onCancel();
     }
   };

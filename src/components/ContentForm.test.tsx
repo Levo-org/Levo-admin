@@ -9,7 +9,13 @@ describe('ContentForm', () => {
     render(
       <ContentForm
         contentType="reading"
-        initialData={{ status: 'draft', targetLanguage: 'en', difficulty: 'intermediate', title: 'Reading title' }}
+        initialData={{
+          status: 'draft',
+          targetLanguage: 'en',
+          difficulty: 'intermediate',
+          title: 'Reading title',
+          content: 'Reading content',
+        }}
         onSubmit={handleSubmit}
         onCancel={vi.fn()}
       />,
@@ -39,7 +45,15 @@ describe('ContentForm', () => {
     render(
       <ContentForm
         contentType="vocabulary"
-        initialData={{ status: 'draft', targetLanguage: 'en', level: 'elementary', word: 'word', meaning: 'meaning' }}
+        initialData={{
+          status: 'draft',
+          targetLanguage: 'en',
+          level: 'elementary',
+          chapter: 1,
+          word: 'word',
+          meaning: 'meaning',
+          partOfSpeech: 'noun',
+        }}
         onSubmit={handleSubmit}
         onCancel={vi.fn()}
       />,

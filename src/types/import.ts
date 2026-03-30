@@ -18,14 +18,14 @@ export interface ImportBatch {
 
 export interface ImportError {
   row: number;
-  data: any;
+  data: unknown;
   message: string;
   field?: string;
 }
 
 export interface ImportPreviewRow {
   row: number;
-  data: any;
+  data: unknown;
   status: 'valid' | 'invalid' | 'duplicate';
   errors?: { field?: string; message: string }[];
 }

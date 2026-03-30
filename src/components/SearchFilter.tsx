@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { DIFFICULTY_OPTIONS } from '../services/content.service';
 
 export interface FilterValues {
@@ -25,10 +25,6 @@ const createFilters = (initialValues?: Partial<FilterValues>): FilterValues => (
 
 export const SearchFilter: React.FC<SearchFilterProps> = ({ onFilter, initialValues, contentType }) => {
   const [filters, setFilters] = useState<FilterValues>(createFilters(initialValues));
-
-  useEffect(() => {
-    setFilters(createFilters(initialValues));
-  }, [initialValues, contentType]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

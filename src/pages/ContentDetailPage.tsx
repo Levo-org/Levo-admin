@@ -2,16 +2,19 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { contentService, ContentItem } from '../services/content.service';
 import { ContentForm } from '../components/ContentForm';
+import { useAuthStore } from '../stores/authStore';
 
 export default function ContentDetailPage() {
   const { contentType, id } = useParams<{ contentType: string; id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const isNew = id === 'new';
+  const canDelete = user?.role === 'admin' && !isNew;
   
   const [data, setData] = useState<Partial<ContentItem> | null>(null);
   const [loading, setLoading] = useState(!isNew);
   const [error, setError] = useState('');
-  const [_saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const createInitialData = (type?: string): Partial<ContentItem> => {
     if (type === 'listening' || type === 'reading') {
@@ -50,7 +53,6 @@ export default function ContentDetailPage() {
     if (!contentType) return;
     
     try {
-      setSaving(true);
       if (isNew) {
         await contentService.create(contentType, formData);
         navigate(`/content/${contentType}`);
@@ -62,8 +64,24 @@ export default function ContentDetailPage() {
     } catch (err: unknown) {
       setError('저장 중 오류가 발생했습니다.');
       console.error(err);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!canDelete || !contentType || !id) return;
+
+    const confirmed = window.confirm('이 콘텐츠를 삭제(보관 처리)하시겠습니까?');
+    if (!confirmed) return;
+
+    try {
+      setDeleting(true);
+      await contentService.delete(contentType, id);
+      navigate(`/content/${contentType}`);
+    } catch (err: unknown) {
+      setError('삭제 중 오류가 발생했습니다.');
+      console.error(err);
     } finally {
-      setSaving(false);
+      setDeleting(false);
     }
   };
 
@@ -73,15 +91,23 @@ export default function ContentDetailPage() {
     <div className="admin-page">
       <div className="page-header">
         <h1 className="page-title">{isNew ? '새 콘텐츠' : '콘텐츠 상세 / 수정'}</h1>
-        <button className="btn btn-secondary" onClick={() => navigate(`/content/${contentType}`)}>
-          목록으로
-        </button>
+        <div style={{ display: 'flex', gap: 'var(--spacing-2)' }}>
+          {canDelete && (
+            <button className="btn btn-danger" onClick={handleDelete} disabled={deleting}>
+              {deleting ? '삭제 중...' : '삭제'}
+            </button>
+          )}
+          <button className="btn btn-secondary" onClick={() => navigate(`/content/${contentType}`)}>
+            목록으로
+          </button>
+        </div>
       </div>
 
       {error && <div style={{ color: 'var(--color-danger)', marginBottom: 'var(--spacing-4)' }}>{error}</div>}
 
       {data && (
         <ContentForm
+          key={`${contentType}-${id}`}
           initialData={data}
           contentType={contentType || 'vocabulary'}
           onSubmit={handleSubmit}

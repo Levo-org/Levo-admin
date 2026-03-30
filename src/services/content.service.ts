@@ -28,20 +28,34 @@ export interface ContentItem {
   exampleSentence?: string;
   exampleTranslation?: string;
   
-  // grammar, listening, reading
+  // grammar, conversation, reading
   title?: string;
-  description?: string;
+  subtitle?: string;
+  englishTitle?: string;
+  explanation?: string;
+  formula?: string;
+  formulaExample?: string;
   structure?: string;
-  examples?: Array<{text: string; translation: string}>;
+  examples?: Array<{ text?: string; sentence?: string; translation: string }>;
   
   // conversation
-  dialogues?: Array<{speaker: string; text: string; translation: string}>;
+  dialogs?: Array<{ speaker: string; text: string; translation: string }>;
+  keyExpressions?: Array<{ expression: string; meaning: string }>;
   
   // exampleSentence
   text?: string;
+  originalText?: string;
   translation?: string;
   source?: string;
   license?: string;
+
+  // listening
+  audioText?: string;
+  correctAnswer?: string;
+  hint?: string;
+
+  // reading
+  content?: string;
 
   // shared
   sourceType?: string;

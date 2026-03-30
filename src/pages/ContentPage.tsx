@@ -4,6 +4,7 @@ import { contentService, ContentItem, DIFFICULTY_OPTIONS } from '../services/con
 import { ContentTable } from '../components/ContentTable';
 import { FilterValues, SearchFilter } from '../components/SearchFilter';
 import { Pagination } from '../components/Pagination';
+import { useAuthStore } from '../stores/authStore';
 
 const contentTypes = [
   { id: 'vocabulary', label: '단어' },
@@ -17,7 +18,9 @@ const contentTypes = [
 export default function ContentPage() {
   const { contentType } = useParams<{ contentType: string }>();
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const currentType = contentType || 'vocabulary';
+  const canDelete = user?.role === 'admin';
 
   const createFilters = (): FilterValues => ({
     search: '',
@@ -30,6 +33,7 @@ export default function ContentPage() {
   const [items, setItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Pagination & Filters
   const [page, setPage] = useState(1);
@@ -60,6 +64,7 @@ export default function ContentPage() {
   const loadData = async () => {
     try {
       setLoading(true);
+      setError('');
       const selectedLevel = DIFFICULTY_OPTIONS.find((option) => option.value === filters.level)?.value;
 
       const res = await contentService.getList(currentType, {
@@ -88,6 +93,24 @@ export default function ContentPage() {
     setPage(1);
   };
 
+  const handleDelete = async (id: string) => {
+    if (!canDelete) return;
+
+    const confirmed = window.confirm('이 콘텐츠를 삭제(보관 처리)하시겠습니까?');
+    if (!confirmed) return;
+
+    try {
+      setDeletingId(id);
+      await contentService.delete(currentType, id);
+      await loadData();
+    } catch (err: unknown) {
+      setError('콘텐츠 삭제 중 오류가 발생했습니다.');
+      console.error(err);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div className="admin-page">
       <div className="page-header">
@@ -110,13 +133,18 @@ export default function ContentPage() {
       </div>
 
       <div className="card">
-        <SearchFilter onFilter={handleFilter} initialValues={filters} contentType={currentType} />
+        <SearchFilter key={currentType} onFilter={handleFilter} initialValues={filters} contentType={currentType} />
         {error && <div style={{ color: 'var(--color-danger)', padding: 'var(--spacing-4)' }}>{error}</div>}
         {loading ? (
           <div style={{ padding: 'var(--spacing-6)', textAlign: 'center' }}>로딩 중...</div>
         ) : (
           <>
-            <ContentTable items={items} contentType={currentType} />
+            <ContentTable
+              items={items}
+              contentType={currentType}
+              onDelete={canDelete ? handleDelete : undefined}
+              deletingId={deletingId}
+            />
             <Pagination
               page={page}
               totalPages={totalPages || 1}

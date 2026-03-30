@@ -10,11 +10,13 @@ interface ContentFormProps {
 
 export const ContentForm: React.FC<ContentFormProps> = ({ initialData, contentType, onSubmit, onCancel }) => {
   const difficultyFieldName = contentType === 'listening' || contentType === 'reading' ? 'difficulty' : 'level';
-  const [formData, setFormData] = useState<Partial<ContentItem>>(initialData || {
+  const createDefaultFormData = (): Partial<ContentItem> => ({
     status: 'draft',
     targetLanguage: 'en',
     [difficultyFieldName]: 'beginner',
   });
+
+  const [formData, setFormData] = useState<Partial<ContentItem>>(initialData || createDefaultFormData());
   const selectedDifficulty = (difficultyFieldName === 'difficulty' ? formData.difficulty : formData.level) || 'beginner';
 
   const isPublished = formData.status === 'published';
@@ -103,6 +105,19 @@ export const ContentForm: React.FC<ContentFormProps> = ({ initialData, contentTy
       {contentType === 'vocabulary' && (
         <>
           <div className="form-group">
+            <label className="form-label">챕터</label>
+            <input
+              type="number"
+              name="chapter"
+              min={1}
+              value={formData.chapter ?? ''}
+              onChange={handleChange}
+              className="form-control"
+              required
+              disabled={isReadOnly}
+            />
+          </div>
+          <div className="form-group">
             <label className="form-label">단어 (Word)</label>
             <input type="text" name="word" value={formData.word || ''} onChange={handleChange} className="form-control" required disabled={isReadOnly} />
           </div>
@@ -112,20 +127,29 @@ export const ContentForm: React.FC<ContentFormProps> = ({ initialData, contentTy
           </div>
           <div className="form-group">
             <label className="form-label">품사</label>
-            <input type="text" name="partOfSpeech" value={formData.partOfSpeech || ''} onChange={handleChange} className="form-control" disabled={isReadOnly} />
+            <input type="text" name="partOfSpeech" value={formData.partOfSpeech || ''} onChange={handleChange} className="form-control" required disabled={isReadOnly} />
           </div>
         </>
       )}
 
-      {(contentType === 'grammar' || contentType === 'listening' || contentType === 'reading' || contentType === 'conversation') && (
+      {contentType === 'grammar' && (
         <>
           <div className="form-group">
             <label className="form-label">제목 (Title)</label>
             <input type="text" name="title" value={formData.title || ''} onChange={handleChange} className="form-control" required disabled={isReadOnly} />
           </div>
           <div className="form-group">
-            <label className="form-label">설명 (Description)</label>
-            <textarea name="description" value={formData.description || ''} onChange={handleChange} className="form-control" rows={4} disabled={isReadOnly} />
+            <label className="form-label">설명 (Explanation)</label>
+            <textarea name="explanation" value={formData.explanation || ''} onChange={handleChange} className="form-control" rows={4} disabled={isReadOnly} />
+          </div>
+        </>
+      )}
+
+      {contentType === 'conversation' && (
+        <>
+          <div className="form-group">
+            <label className="form-label">제목 (Title)</label>
+            <input type="text" name="title" value={formData.title || ''} onChange={handleChange} className="form-control" required disabled={isReadOnly} />
           </div>
         </>
       )}
@@ -133,12 +157,92 @@ export const ContentForm: React.FC<ContentFormProps> = ({ initialData, contentTy
       {contentType === 'exampleSentence' && (
         <>
           <div className="form-group">
-            <label className="form-label">문장 (Text)</label>
-            <textarea name="text" value={formData.text || ''} onChange={handleChange} className="form-control" rows={3} required disabled={isReadOnly} />
+            <label className="form-label">문장 (Original Text)</label>
+            <textarea
+              name="originalText"
+              value={formData.originalText || formData.text || ''}
+              onChange={handleChange}
+              className="form-control"
+              rows={3}
+              required
+              disabled={isReadOnly}
+            />
           </div>
           <div className="form-group">
             <label className="form-label">번역 (Translation)</label>
             <textarea name="translation" value={formData.translation || ''} onChange={handleChange} className="form-control" rows={3} disabled={isReadOnly} />
+          </div>
+        </>
+      )}
+
+      {contentType === 'listening' && (
+        <>
+          <div className="form-group">
+            <label className="form-label">오디오 텍스트</label>
+            <textarea
+              name="audioText"
+              value={formData.audioText || ''}
+              onChange={handleChange}
+              className="form-control"
+              rows={3}
+              required
+              disabled={isReadOnly}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">정답</label>
+            <input
+              type="text"
+              name="correctAnswer"
+              value={formData.correctAnswer || ''}
+              onChange={handleChange}
+              className="form-control"
+              required
+              disabled={isReadOnly}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">힌트</label>
+            <input
+              type="text"
+              name="hint"
+              value={formData.hint || ''}
+              onChange={handleChange}
+              className="form-control"
+              disabled={isReadOnly}
+            />
+          </div>
+        </>
+      )}
+
+      {contentType === 'reading' && (
+        <>
+          <div className="form-group">
+            <label className="form-label">제목 (Title)</label>
+            <input type="text" name="title" value={formData.title || ''} onChange={handleChange} className="form-control" required disabled={isReadOnly} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">본문 (Content)</label>
+            <textarea
+              name="content"
+              value={formData.content || ''}
+              onChange={handleChange}
+              className="form-control"
+              rows={6}
+              required
+              disabled={isReadOnly}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">번역 (Translation)</label>
+            <textarea
+              name="translation"
+              value={formData.translation || ''}
+              onChange={handleChange}
+              className="form-control"
+              rows={4}
+              disabled={isReadOnly}
+            />
           </div>
         </>
       )}
