@@ -23,6 +23,7 @@ export interface ContentItem {
   // vocabulary
   word?: string;
   meaning?: string;
+  meanings?: string[];
   pronunciation?: string;
   partOfSpeech?: string;
   exampleSentence?: string;

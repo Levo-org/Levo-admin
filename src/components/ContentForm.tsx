@@ -126,6 +126,17 @@ export const ContentForm: React.FC<ContentFormProps> = ({ initialData, contentTy
             <input type="text" name="meaning" value={formData.meaning || ''} onChange={handleChange} className="form-control" required disabled={isReadOnly} />
           </div>
           <div className="form-group">
+            <label className="form-label">다의어 (Meanings)</label>
+            <textarea
+              value={Array.isArray(formData.meanings) ? formData.meanings.join('\n') : ''}
+              className="form-control"
+              rows={Math.max(2, Array.isArray(formData.meanings) ? formData.meanings.length : 2)}
+              disabled
+              readOnly
+              placeholder="다의어 정보가 있으면 여기에 표시됩니다."
+            />
+          </div>
+          <div className="form-group">
             <label className="form-label">품사</label>
             <input type="text" name="partOfSpeech" value={formData.partOfSpeech || ''} onChange={handleChange} className="form-control" required disabled={isReadOnly} />
           </div>
