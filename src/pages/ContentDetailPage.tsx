@@ -45,6 +45,7 @@ const buildAppPreview = (contentType: string, data: Partial<ContentItem>): Recor
       pronunciation: data.pronunciation || '',
       meaning: data.meaning || '',
       meanings: data.meanings || [],
+      meaningExamples: data.meaningExamples || [],
       partOfSpeech: data.partOfSpeech || '',
       exampleSentence: data.exampleSentence || '',
       exampleTranslation: data.exampleTranslation || '',

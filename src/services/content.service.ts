@@ -24,6 +24,11 @@ export interface ContentItem {
   word?: string;
   meaning?: string;
   meanings?: string[];
+  meaningExamples?: Array<{
+    meaning: string;
+    exampleSentence: string;
+    exampleTranslation: string;
+  }>;
   pronunciation?: string;
   partOfSpeech?: string;
   exampleSentence?: string;
